@@ -14,11 +14,12 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>5.3.7.Final</version>
         </dependency>
-        <!-- hibernate-entitymanager 을 지정하면 다른 라이브러리들을 자동으로 포함시킴
+        <!--
+            note: hibernate-entitymanager 을 지정하면 다른 라이브러리들을 자동으로 포함시킴 (아래 라이브러리가 포함되어야 한다)
             org.hibernate.core / org.hibernate.common / javax.persistence (JPA 인터페이스) / ..
         -->
         <dependency>
-            <groupId>com.h2database</groupId>
+            <groupId>com.h2database</groupId> <!-- h2 DB -->
             <artifactId>h2</artifactId>
             <version>1.4.200</version>
         </dependency>

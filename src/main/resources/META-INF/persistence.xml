@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.2">
-
-    <persistence-unit name="hello">
+    <!--
+        note: jpa 가 실행 할때 persistence.xml 파일이 꼭 있어야 jpa가 작동한다 (경로: /main/resources/META-INF/ )
+        스프링부트를 쓰면 이런거 없이 동작한다. 내부적으로 작동함
+        표준스펙 이해 필요
+    -->
+    <persistence-unit name="hello"> <!-- note: name="hello"? EntityManagerFactory 에서 설정정보를 참조하기 위한 이름 세팅-->
         <properties>
 
             <!-- 필수 속성 -->
-            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/><!-- note: javax.persistence.* / 자바 표준 jpa -->
             <property name="javax.persistence.jdbc.user" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
             <property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/test"/>
-            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/><!-- note: 하이버네이트에서만 쓸 수 있다. dialect(방언) : SQL 표준을 지키지 않거나 특정 DB만의 고유한 기능-->
 
             <!-- 옵션 -->
             <property name="hibernate.show_sql" value="true"/>
@@ -17,7 +21,21 @@
             <property name="hibernate.use_sql_comments" value="true"/>
             <!--<property name="hibernate.id.new_generator_mappings" value="true"/>-->
 
-            <!--<property name="hibernate.hbm2ddl.auto" value="create"/>-->
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <!--
+                -   hibernate.hbm2ddl.auto
+                    -   create: 기존테이블 삭제 후 다시 생성 (DROP + CREATE)
+                    -   create-drop: create와 같으나 종료시점에 테이블 DROP
+                    -   update: 변경분만 반영(운영DB에는 사용하면 안됨) (alter table 반영 가능)
+                    -   validate: 엔티티와 테이블이 정상 매핑되었는지만 확인 (개발정도에서 쓰면 괜찮음)
+                    -   none: 사용하지 않음
+
+                    -   persistence.xml 에 옵션으로 설정 ex) <property name="hibernate.hbm2ddl.auto" value="create"/>
+                    -   !운영 장비에는 절대 create, create-drop, update 사용하면 안된다
+                    -   개발 초기 단계는 create 또는 update
+                    -   테스트 서버는 update 또는 validate
+                    -   스테이징과 운영 서버는 validate 또는 none
+            -->
         </properties>
     </persistence-unit>
 </persistence>
