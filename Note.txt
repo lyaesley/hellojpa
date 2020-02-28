@@ -7,6 +7,9 @@ JPA 김영한님의 강의 내용 메모
 -   이렇게 !생성된 DDL은 개발 장비에서만 사용!
 -   생선된 DDL은 운영서버에서는 사용하지 않거나, 적절히 다듬은 후 사용
 
+# JPA에서 가중 중요한 2가지
+    -   객체와 관계형 데이터베이스 매핑하기 (Object Relational Mapping)
+    -   영속성 컨텍스트
 
 # 데이터베이스 스키마 자동 생성하기
 
@@ -72,5 +75,65 @@ JPA 김영한님의 강의 내용 메모
     -   테이블과 객체 사이에는 이런 큰 간격이 있다.
 
 # 연관관계 매핑 이론
+
     #단방향 매핑
-        -
+
+                [객체 연관관계]
+        Member(TABLE) ------->  Team(TABLE)
+        id                0..1  id
+    ┌-  Team team               name
+    |   userName
+    |
+    |
+    |   [연관관계매핑] 설정
+    |   @ManyToOne  //다:1
+    |   @JoinColumn(name = "TEAM_ID")  // MEMBER 테이블의 TEAM_ID와 MEMBER 객체의 TEAM_ID를 매핑한다.
+    |   private TEam team;
+    |
+    |
+    |           [테이블 연관 관계]
+    |   Member(TABLE)   다:1    Team(TABLE)
+    |   MEMBER_ID (PK)     ┌--1 TEAM_ID (PK)
+    └-> TEAM_ID (FK) 다----┘    NAME
+        USERNAME
+
+
+    #양방향 매핑
+        -   양방향 매핑시 연관관계의 주인에 값을 입력해야 한다.
+            (순수한 객체 관계를 고려하면 항상 양쪽다 값을 입력해야 한다.)
+        -   누구를 주인으로?
+            -   외래 키가 있는 곳을 주인으로 정해라
+            -   여기서는 Member.team 이 연관관계의 주인
+
+    #   양방향 매핑의 장점
+        -   단방향 매핑만으로도 이미 연관관계 매핑은 완료
+        -   양방향 매핑은 반대 방향으로 조회(객체 그래프 탐색) 기능이 추가된 것 뿐
+        -   JPQL에서 역방향으로 탐색할 일이 많음
+        -   단방향 매핑을 잘 하고 양방향은 필요할 때 추가해도 됨 (테이블에 영향을 주지 않음)
+
+
+                [객체 연관관계]
+        Member(TABLE) <--------->  Team(TABLE)
+        id             *    0..1   id
+    ┌-  Team team                  name
+    |   userName                   List members
+    |
+    |
+    |   [연관관계매핑] Team 테이블에 설정
+    |   @OneToMany(mappedBy = "team")
+    |   private List<Member> members = new ArrayList<Member>();
+    |
+    |
+    |
+    |           [테이블 연관 관계]
+    |   Member(TABLE)   다:1    Team(TABLE)
+    |   MEMBER_ID (PK)     ┌--1 TEAM_ID (PK)
+    └-> TEAM_ID (FK) 다----┘    NAME
+        USERNAME
+
+
+#JPA 내부구조
+    #영속성 컨텍스트
+
+    #프록시와 즉시로딩, 지연로딩
+

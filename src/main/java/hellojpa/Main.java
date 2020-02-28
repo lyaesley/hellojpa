@@ -33,7 +33,7 @@ public class Main {
             //팀 저장
             Team team = new Team();
             team.setName("TeamA");
-            em.persist(team);
+            em.persist(team); // team 객체 캐싱됨
 
             //새로운 팀B 저장
             Team teamB = new Team();
@@ -48,23 +48,25 @@ public class Main {
 //            member.setTeamId(team.getId());
 
             // 객체 지향 모델링 (객체의 참조와 테이블의 외래 키를 매핑)
-//            member.setTeam(team);
+//            member.setTeam(team);   // 단방향 연관관계 설정, 참조 저장
 
             member.setName("안녕하세요");
             member.setMemberType(MemberType.USER);
             member.setRegDate(new Date());
             member.setTransientTest("이것은 저장되지 않음");
 
+            member.setTeam(teamB);
             em.persist(member); // 영구 저장하다 라는 표현
-            team.getMembers().add(member);
+
+            teamB.getMembers().add(member);
             // Q : DB 에 member 객체가 Insert 될까?
             // A : 안된다. DB member 테이블에 저장되지 않는다. @OneToMany(mappedBy = "team") 설정으로 무시된다. 자세히 공부 필요!
-            member.setTeam(teamB);
-            member.setTeamId(teamB.getId());
+//            member.setTeam(teamB);
+//            member.setTeamId(teamB.getId());
 
             //
-            em.flush();   // DB 에 쿼리를 다 보냄
-            em.clear();   // 캐쉬를 깨끗하게 다 비움
+//            em.flush();   // DB 에 쿼리를 다 보냄
+//            em.clear();   // 캐쉬를 깨끗하게 다 비움
             ////////////////////////////////////////////////
 
             Member findMember = em.find(Member.class, member.getId());
@@ -77,11 +79,16 @@ public class Main {
 
 
             // 객체 지향 모델링 (객체의 참조와 테이블의 외래 키를 매핑) S
-            Team findTeam2 = findMember.getTeam();  // 검색한 member 객체에서 Team 객체를 꺼낸다.
+            Team findTeam2 = findMember.getTeam();
+            // 참조를 사용해서 연관관계 조회. 검색한 member 객체에서 Team 객체를 꺼낸다.
+            // @ManyToOne(fetch = FetchType.LAZY) (지연로딩) 를 설정시 객체를 사용해야 DB SELECT 를 한다 ex)findTeam2.getName(); //김영한님 권장
+            // @ManyToOne(fetch = FetchType.EAGER) (dafault) 는 한방쿼리 JOIN 쿼리로 member, team 객체를 한번에 가져온다.
+            System.out.println(findTeam2);
             System.out.println("출력 size() 111 = " + findTeam2.getMembers().size()); // 결과: 1
 
             Member member2 = findTeam2.getMembers().get(0); // findMember === member2 ? true
             // 역방향으로 가져온 객체에는 @Transient 로 설정한 필드를 읽어 오지 못한다. (DB 에 저장되지 않으니 당연한 얘기인듯)
+            // 위에 em.flush(); em.clear(); 을 하지 않으면 findTeam2.getMembers() == null 이다. 공부 필요!
             System.out.println("출력 member2 변경전 = " + member2);
 
             findTeam2.getMembers().add(member2);
